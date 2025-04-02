@@ -72,6 +72,22 @@
                                     <pattern>com.artillexstudios.axintegrations</pattern>
                                     <shadedPattern>com.artillexstudios.axplayerwarps.libs.axintegrations</shadedPattern>
                                 </relocation>
+                                <relocation>
+                                    <pattern>org.postgresql</pattern>
+                                    <shadedPattern>com.artillexstudios.axplayerwarps.libs.postgresql</shadedPattern>
+                                </relocation>
+                                <relocation>
+                                    <pattern>org.h2</pattern>
+                                    <shadedPattern>com.artillexstudios.axplayerwarps.libs.h2database</shadedPattern>
+                                </relocation>
+                                <relocation>
+                                    <pattern>com.mysql</pattern>
+                                    <shadedPattern>com.artillexstudios.axplayerwarps.libs.mysql</shadedPattern>
+                                </relocation>
+                                <relocation>
+                                    <pattern>org.apache.commons.collections4</pattern>
+                                    <shadedPattern>com.artillexstudios.axplayerwarps.libs.apachecollections4</shadedPattern>
+                                </relocation>
                             </relocations>
                         </configuration>
                     </execution>
