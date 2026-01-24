@@ -5,38 +5,34 @@ import com.artillexstudios.axapi.utils.Cooldown;
 import com.artillexstudios.axapi.utils.Pair;
 import org.bukkit.entity.Player;
 
-import java.util.Iterator;
 import java.util.Map;
-import java.util.WeakHashMap;
+import java.util.concurrent.ConcurrentHashMap;
 
 import static com.artillexstudios.axplayerwarps.AxPlayerWarps.CONFIG;
 import static com.artillexstudios.axplayerwarps.AxPlayerWarps.MESSAGEUTILS;
 
 public class WarpQueue {
-    private static final Map<Player, Pair<Warp, Long>> queue = new WeakHashMap<>();
+    private static final ConcurrentHashMap<Player, Pair<Warp, Long>> queue = new ConcurrentHashMap<>();
     private static final Cooldown<Player> cooldown = Cooldown.create();
 
     public static void start() {
         Scheduler.get().runTimer(() -> {
             long time = CONFIG.getLong("teleport-delay-seconds");
-            try {
-                for (Iterator<Map.Entry<Player, Pair<Warp, Long>>> it = queue.entrySet().iterator(); it.hasNext(); ) {
-                    Map.Entry<Player, Pair<Warp, Long>> e = it.next();
-                    if (cooldown.hasCooldown(e.getKey())) continue;
+            long currentTime = System.currentTimeMillis();
 
-                    cooldown.addCooldown(e.getKey(), 1_000L);
-                    long spent = (System.currentTimeMillis() - e.getValue().getValue()) / 1_000L;
-                    if (spent >= time) {
-                        e.getValue().getKey().completeTeleportPlayer(e.getKey());
-                        it.remove();
-                        continue;
+            queue.forEach((player, warpPair) -> {
+                if (cooldown.hasCooldown(player)) return;
+                cooldown.addCooldown(player, 1_000L);
+                long spent = (currentTime - warpPair.getValue()) / 1_000L;
+                if (spent >= time) {
+                    if (queue.remove(player, warpPair)) {
+                        warpPair.getKey().completeTeleportPlayer(player);
                     }
-
-                    MESSAGEUTILS.sendLang(e.getKey(), "teleport.in", Map.of("%seconds%", "" + (time - spent)));
+                } else {
+                    MESSAGEUTILS.sendLang(player, "teleport.in", 
+                        Map.of("%seconds%", String.valueOf(time - spent)));
                 }
-            } catch (Exception ex) {
-                ex.printStackTrace();
-            }
+            });
         }, 2, 2);
     }
 
