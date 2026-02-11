@@ -1,6 +1,7 @@
 package com.artillexstudios.axplayerwarps.hooks.currency;
 
 import com.artillexstudios.axapi.libs.boostedyaml.block.implementation.Section;
+import com.artillexstudios.axapi.scheduler.Scheduler;
 import me.clip.placeholderapi.PlaceholderAPI;
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
@@ -63,7 +64,7 @@ public class PlaceholderCurrencyHook implements CurrencyHook {
         final String placeholder = section.getString("settings.give-command")
                 .replace("%amount%", parseNumber(amount))
                 .replace("%player%", pl.getName());
-        Bukkit.dispatchCommand(Bukkit.getConsoleSender(), placeholder);
+        Scheduler.get().run(task -> Bukkit.dispatchCommand(Bukkit.getConsoleSender(), placeholder));
     }
 
     @Override
@@ -73,7 +74,7 @@ public class PlaceholderCurrencyHook implements CurrencyHook {
         final String placeholder = section.getString("settings.take-command")
                 .replace("%amount%", parseNumber(amount))
                 .replace("%player%", pl.getName());
-        Bukkit.dispatchCommand(Bukkit.getConsoleSender(), placeholder);
+        Scheduler.get().run(task -> Bukkit.dispatchCommand(Bukkit.getConsoleSender(), placeholder));
     }
 
     private String parseNumber(double amount) {

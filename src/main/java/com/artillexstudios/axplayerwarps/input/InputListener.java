@@ -7,15 +7,16 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.AsyncPlayerChatEvent;
 
-import java.util.WeakHashMap;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Consumer;
 
 import static com.artillexstudios.axplayerwarps.AxPlayerWarps.INPUT;
 
 public class InputListener implements Listener {
-    public static WeakHashMap<Player, Consumer<String>> inputPlayers = new WeakHashMap<>();
+    public static final ConcurrentHashMap<Player, Consumer<String>> inputPlayers = new ConcurrentHashMap<>();
 
-    public static WeakHashMap<Player, Consumer<String>> getInputPlayers() {
+    public static Map<Player, Consumer<String>> getInputPlayers() {
         return inputPlayers;
     }
 

@@ -101,14 +101,12 @@ public class BlacklistGui extends GuiFrame {
 
         load().thenRun(() -> {
             updateTitle();
-            gui.open(player);
+            Scheduler.get().runAt(player.getLocation(), task -> gui.open(player));
         });
     }
 
     public void update() {
-        load().thenRun(() -> {
-            gui.update();
-        });
+        load().thenRun(gui::update);
     }
 
     public CompletableFuture<Void> load() {
@@ -142,9 +140,7 @@ public class BlacklistGui extends GuiFrame {
                 }));
             }
 
-            Scheduler.get().run(scheduledTask -> {
-                future.complete(null);
-            });
+            Scheduler.get().run(scheduledTask -> future.complete(null));
         });
 
         return future;

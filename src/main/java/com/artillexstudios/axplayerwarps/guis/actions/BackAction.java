@@ -1,5 +1,6 @@
 package com.artillexstudios.axplayerwarps.guis.actions;
 
+import com.artillexstudios.axapi.scheduler.Scheduler;
 import com.artillexstudios.axguiframework.GuiFrame;
 import com.artillexstudios.axguiframework.actions.Action;
 import com.artillexstudios.axplayerwarps.user.Users;
@@ -29,7 +30,7 @@ public class BackAction extends Action {
         try {
             secondLastEl = last.get(last.size() - 1);
         } catch (NoSuchElementException ex) {
-            player.closeInventory();
+            Scheduler.get().runAt(player.getLocation(), player::closeInventory);
             return;
         }
 

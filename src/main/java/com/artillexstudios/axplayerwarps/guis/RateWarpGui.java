@@ -106,6 +106,6 @@ public class RateWarpGui extends GuiFrame {
         });
 
         gui.update();
-        gui.open(player);
+        Scheduler.get().runAt(player.getLocation(), task -> gui.open(player));
     }
 }

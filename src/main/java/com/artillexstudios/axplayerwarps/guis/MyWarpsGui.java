@@ -137,14 +137,14 @@ public class MyWarpsGui extends GuiFrame {
         });
 
         loadWarps().thenRun(() -> {
-            gui.open(player, page);
+            if (player != null) {
+                Scheduler.get().runAt(player.getLocation(), task -> gui.open(player, page));
+            }
         });
     }
 
     public void update() {
-        loadWarps().thenRun(() -> {
-            gui.update();
-        });
+        loadWarps().thenRun(gui::update);
     }
 
     @Override
