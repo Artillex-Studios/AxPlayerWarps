@@ -54,6 +54,7 @@ public class InputManager {
                     if (ended.get()) return;
                     if (clickEvent.getSlot() != 2) return;
                     ItemStack item = clickEvent.getInventory().getItem(2);
+                    if (item == null || !item.hasItemMeta() || !item.getItemMeta().hasDisplayName()) return;
                     String res = item.getItemMeta().getDisplayName();
                     clickEvent.getInventory().clear();
                     Scheduler.get().run(() -> consumer.accept(res));
@@ -68,7 +69,7 @@ public class InputManager {
     }
 
     private static void openChat(Player player, Section section, Consumer<String> consumer) {
-        player.closeInventory();
+        Scheduler.get().runAt(player.getLocation(), player::closeInventory);
         player.sendMessage(String.join("\n", StringUtils.formatListToString(section.getStringList("chat"))));
         InputListener.getInputPlayers().put(player, consumer);
     }

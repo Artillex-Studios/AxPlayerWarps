@@ -322,6 +322,8 @@ public class Base implements Database {
 
     public int getWorldId(World world) {
         ThreadUtils.checkNotMain("This method can only be called async!");
+        if (world == null) return -1;
+
         try (Connection conn = getConnection(); PreparedStatement stmt = createStatement(conn,
                 "SELECT id FROM axplayerwarps_worlds WHERE world = ?",
                 world.getName())
@@ -483,6 +485,10 @@ public class Base implements Database {
     @Override
     public void updateWarp(Warp warp) {
         ThreadUtils.checkNotMain("This method can only be called async!");
+
+        int worldId = getWorldId(warp.getLocation().getWorld());
+        if (worldId == -1) return;
+
         execute("""
                 UPDATE axplayerwarps_warps SET
                 owner_id = ?,
@@ -503,7 +509,7 @@ public class Base implements Database {
                 WHERE id = ?
                 """,
                 getPlayerId(warp.getOwner()),
-                getWorldId(warp.getLocation().getWorld()),
+                worldId,
                 warp.getLocation().getX(),
                 warp.getLocation().getY(),
                 warp.getLocation().getZ(),

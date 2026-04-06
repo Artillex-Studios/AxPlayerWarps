@@ -5,6 +5,7 @@ import com.artillexstudios.axapi.libs.boostedyaml.settings.dumper.DumperSettings
 import com.artillexstudios.axapi.libs.boostedyaml.settings.general.GeneralSettings;
 import com.artillexstudios.axapi.libs.boostedyaml.settings.loader.LoaderSettings;
 import com.artillexstudios.axapi.libs.boostedyaml.settings.updater.UpdaterSettings;
+import com.artillexstudios.axapi.scheduler.Scheduler;
 import com.artillexstudios.axapi.utils.StringUtils;
 import com.artillexstudios.axguiframework.GuiFrame;
 import com.artillexstudios.axplayerwarps.AxPlayerWarps;
@@ -46,6 +47,6 @@ public class CategoryGui extends GuiFrame {
 
     public void open() {
         gui.update();
-        gui.open(player);
+        Scheduler.get().runAt(player.getLocation(), task -> gui.open(player));
     }
 }

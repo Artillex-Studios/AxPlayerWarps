@@ -94,21 +94,19 @@ public class WhitelistGui extends GuiFrame {
                         AxPlayerWarps.getDatabase().addToList(warp, al, Bukkit.getOfflinePlayer(uuid));
                         MESSAGEUTILS.sendLang(player, al.name().toLowerCase() + ".add", Map.of("%player%", result));
                     }
-                    Scheduler.get().run(() -> open());
+                    Scheduler.get().runAt(player.getLocation(), task -> this.open());
                 });
             });
         });
 
         load().thenRun(() -> {
             updateTitle();
-            gui.open(player);
+            Scheduler.get().runAt(player.getLocation(), task -> gui.open(player));
         });
     }
 
     public void update() {
-        load().thenRun(() -> {
-            gui.update();
-        });
+        load().thenRun(gui::update);
     }
 
     public CompletableFuture<Void> load() {
