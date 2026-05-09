@@ -34,7 +34,7 @@ public class WarpNameUtils {
             }
         }
 
-        if (SimpleRegex.matches(CONFIG.getStringList("warp-naming.disallowed"), name)) {
+        if (SimpleRegex.matches(CONFIG.getStringList("warp-naming.disallowed"), name, CONFIG.getBoolean("warp-naming.disallowed-ignore-case"))) {
             return ValidationResult.DISALLOWED;
         }
 

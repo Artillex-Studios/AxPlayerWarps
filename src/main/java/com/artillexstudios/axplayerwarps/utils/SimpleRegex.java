@@ -1,10 +1,15 @@
 package com.artillexstudios.axplayerwarps.utils;
 
 import java.util.List;
+import java.util.Locale;
 
 public class SimpleRegex {
 
     public static boolean matches(List<String> list, String cmd) {
+        return matches(list, cmd, false);
+    }
+
+    public static boolean matches(List<String> list, String cmd, boolean ignoreCase) {
         for (String string : list) {
             if (string.isBlank()) continue;
             RegexType regexType = RegexType.EQUALS;
@@ -23,6 +28,10 @@ public class SimpleRegex {
                 regexType = RegexType.ENDS_WITH;
             }
 
+            if (ignoreCase) {
+                cmd = cmd.toLowerCase(Locale.ROOT);
+                string = string.toLowerCase(Locale.ROOT);
+            }
             boolean result = switch (regexType) {
                 case CONTAINS -> cmd.contains(string);
                 case STARTS_WITH -> cmd.endsWith(string);
