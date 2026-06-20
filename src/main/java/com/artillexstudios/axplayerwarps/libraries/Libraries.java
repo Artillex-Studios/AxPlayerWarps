@@ -9,7 +9,7 @@ import java.util.List;
 
 public enum Libraries {
 
-    HIKARICP("com{}zaxxer:HikariCP:7.0.2", relocation("com{}zaxxer{}hikari", "com.artillexstudios.axplayerwarps.libs.hikari")),
+    HIKARICP("com{}zaxxer:HikariCP:7.1.0", relocation("com{}zaxxer{}hikari", "com.artillexstudios.axplayerwarps.libs.hikari")),
 
     MYSQL_CONNECTOR("com{}mysql:mysql-connector-j:9.2.0", relocation("com{}mysql", "com.artillexstudios.axplayerwarps.libs.mysql")),
 
