@@ -1,6 +1,7 @@
 package com.artillexstudios.axplayerwarps.commands.subcommands;
 
 import com.artillexstudios.axapi.utils.Cooldown;
+import com.artillexstudios.axintegrations.types.ProtectionIntegration;
 import com.artillexstudios.axplayerwarps.AxPlayerWarps;
 import com.artillexstudios.axplayerwarps.enums.Access;
 import com.artillexstudios.axplayerwarps.hooks.HookManager;
@@ -43,7 +44,7 @@ public enum Create {
             return;
         }
 
-        if (!HookManager.canBuild(sender, warpLocation)) {
+        if (!ProtectionIntegration.hasPermission(sender, warpLocation, ProtectionIntegration.Permission.BREAK)) {
             MESSAGEUTILS.sendLang(sender, "errors.cannot-create-here");
             return;
         }

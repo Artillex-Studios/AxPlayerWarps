@@ -3,7 +3,7 @@
 
     <groupId>com.artillexstudios</groupId>
     <artifactId>AxPlayerWarps</artifactId>
-    <version>1.15.0</version>
+    <version>1.15.1</version>
     <packaging>jar</packaging>
 
     <name>AxPlayerWarps</name>
@@ -316,12 +316,13 @@
         </dependency>
         <dependency>
             <groupId>com.artillexstudios.axintegrations</groupId>
-            <artifactId>axintegrations</artifactId>
-            <version>1.2.2</version>
+            <artifactId>AxIntegrations</artifactId>
+            <version>22</version>
+            <scope>compile</scope>
             <exclusions>
                 <exclusion>
-                    <groupId>*</groupId>
                     <artifactId>*</artifactId>
+                    <groupId>*</groupId>
                 </exclusion>
             </exclusions>
         </dependency>
