@@ -2,9 +2,9 @@ package com.artillexstudios.axplayerwarps.hooks;
 
 import com.artillexstudios.axapi.reflection.ClassUtils;
 import com.artillexstudios.axapi.utils.StringUtils;
-import com.artillexstudios.axintegrations.AxIntegrations;
-import com.artillexstudios.axintegrations.integration.protection.ProtectionIntegration;
-import com.artillexstudios.axintegrations.integration.protection.ProtectionIntegrations;
+import com.artillexstudios.axintegrations.IntegrationManager;
+import com.artillexstudios.axintegrations.IntegrationSetup;
+import com.artillexstudios.axintegrations.IntegrationType;
 import com.artillexstudios.axplayerwarps.hooks.currency.AxQuestBoardHook;
 import com.artillexstudios.axplayerwarps.hooks.currency.BeastTokensHook;
 import com.artillexstudios.axplayerwarps.hooks.currency.CoinsEngineHook;
@@ -24,8 +24,6 @@ import com.artillexstudios.axplayerwarps.hooks.currency.TokenManagerHook;
 import com.artillexstudios.axplayerwarps.hooks.currency.UltraEconomyHook;
 import com.artillexstudios.axplayerwarps.hooks.currency.VaultHook;
 import org.bukkit.Bukkit;
-import org.bukkit.Location;
-import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -40,25 +38,31 @@ public class HookManager {
     private static final ArrayList<CurrencyHook> currency = new ArrayList<>();
 
     public static void setupHooks() {
-        updateHooks();
+        IntegrationSetup.builder()
+                .enableProtectionIntegrations(name -> {
+                    return HOOKS.getBoolean("hooks.protection." + name, true);
+                })
+                .runAfterLoad(() -> {
+                    boolean modified = false;
+                    for (String name : IntegrationManager.listAvailableIntegrations(IntegrationType.PROTECTION).keySet()) {
+                        String route = "%s.%s".formatted("hooks.protection", name);
+                        if (HOOKS.getString(route) == null) {
+                            HOOKS.set(route, true);
+                            modified = true;
+                        }
+                    }
+                    if (modified) HOOKS.save();
+                })
+                .runAfterSetup(() -> {
+
+                })
+                .setup();
+        updateHooks(true);
     }
 
-    public static void updateHooks() {
+    public static void updateHooks(boolean setup) {
         currency.removeIf(currencyHook -> !currencyHook.isPersistent());
-
-        ProtectionIntegrations.values().clear();
-        AxIntegrations.INSTANCE.init();
-
-        ProtectionIntegrations.values().removeIf(integration -> !HOOKS.getBoolean("hooks.protection." + integration.id(), false));
-        boolean modified = false;
-        for (ProtectionIntegration integration : ProtectionIntegrations.values()) {
-            if (HOOKS.getString("hooks.protection." + integration.id(), null) == null) {
-                modified = true;
-                HOOKS.set("hooks.protection." + integration.id(), true);
-            }
-            Bukkit.getConsoleSender().sendMessage(StringUtils.formatToString("&#33FF33[AxPlayerWarps] Hooked into " + integration.id() + "!"));
-        }
-        if (modified) HOOKS.save();
+        if (!setup) IntegrationManager.reload();
 
         if (CURRENCIES.getBoolean("currencies.Experience.register", true))
             currency.add(new ExperienceHook());
@@ -178,13 +182,5 @@ public class HookManager {
         }
 
         return null;
-    }
-
-    public static boolean canBuild(Player player, Location location) {
-        for (ProtectionIntegration integration : ProtectionIntegrations.values()) {
-            if (integration.canBuild(player, location)) continue;
-            return false;
-        }
-        return true;
     }
 }
