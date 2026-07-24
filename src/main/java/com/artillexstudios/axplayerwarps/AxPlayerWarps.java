@@ -44,8 +44,6 @@ import com.artillexstudios.axplayerwarps.warps.WarpQueue;
 import com.artillexstudios.axplayerwarps.world.WorldManager;
 import org.bstats.bukkit.Metrics;
 import org.bukkit.Bukkit;
-import revxrsal.zapper.DependencyManager;
-import revxrsal.zapper.relocation.Relocation;
 
 import java.io.File;
 
@@ -76,18 +74,7 @@ public final class AxPlayerWarps extends AxPlugin {
     @Override
     public void dependencies(DependencyManagerWrapper manager) {
         instance = this;
-        manager.repository("https://jitpack.io/");
-        manager.repository("https://repo.codemc.org/repository/maven-public/");
-        manager.repository("https://repo.papermc.io/repository/maven-public/");
-        manager.repository("https://repo.artillex-studios.com/releases/");
-
-        DependencyManager dependencyManager = manager.wrapped();
-        for (Libraries lib : Libraries.values()) {
-            dependencyManager.dependency(lib.fetchLibrary());
-            for (Relocation relocation : lib.relocations()) {
-                dependencyManager.relocate(relocation);
-            }
-        }
+        Libraries.load(this, manager);
     }
 
     // todo future plans

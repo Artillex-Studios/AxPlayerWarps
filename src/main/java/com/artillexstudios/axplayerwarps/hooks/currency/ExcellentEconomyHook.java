@@ -3,8 +3,6 @@ package com.artillexstudios.axplayerwarps.hooks.currency;
 import com.artillexstudios.axapi.utils.StringUtils;
 import org.bukkit.Bukkit;
 import org.jetbrains.annotations.NotNull;
-import su.nightexpress.coinsengine.api.CoinsEngineAPI;
-import su.nightexpress.coinsengine.api.currency.Currency;
 import su.nightexpress.excellenteconomy.api.ExcellentEconomyAPI;
 import su.nightexpress.excellenteconomy.api.currency.ExcellentCurrency;
 

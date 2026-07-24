@@ -3,6 +3,8 @@ package com.artillexstudios.axplayerwarps.commands.subcommands;
 import com.artillexstudios.axapi.utils.Cooldown;
 import com.artillexstudios.axintegrations.types.ProtectionIntegration;
 import com.artillexstudios.axplayerwarps.AxPlayerWarps;
+import com.artillexstudios.axplayerwarps.api.events.AxPlayerWarpsCreateEvent;
+import com.artillexstudios.axplayerwarps.api.events.AxPlayerWarpsPreCreateEvent;
 import com.artillexstudios.axplayerwarps.enums.Access;
 import com.artillexstudios.axplayerwarps.hooks.HookManager;
 import com.artillexstudios.axplayerwarps.hooks.currency.CurrencyHook;
@@ -13,10 +15,9 @@ import com.artillexstudios.axplayerwarps.utils.SimpleRegex;
 import com.artillexstudios.axplayerwarps.utils.WarpNameUtils;
 import com.artillexstudios.axplayerwarps.warps.Warp;
 import com.artillexstudios.axplayerwarps.warps.WarpManager;
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
-import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
-import org.jetbrains.annotations.Nullable;
 
 import java.util.Map;
 import java.util.Optional;
@@ -28,7 +29,7 @@ public enum Create {
     INSTANCE;
 
     private final Cooldown<Player> cooldown = Cooldown.create();
-    public void execute(Player sender, String warpName, @Nullable OfflinePlayer setPlayer) {
+    public void execute(Player sender, String warpName) {
         WarpUser user = Users.get(sender);
         long limit = user.getWarpLimit();
         long warps = WarpManager.getWarps().stream().filter(warp -> warp.getOwner().equals(sender.getUniqueId())).count();
@@ -74,10 +75,33 @@ public enum Create {
             return;
         }
 
-        double price;
+        Warp warp = new Warp(
+                null,
+                System.currentTimeMillis(),
+                null,
+                warpName,
+                warpLocation,
+                warpLocation.getWorld().getName(),
+                null,
+                sender.getUniqueId(),
+                sender.getName(),
+                Access.PUBLIC,
+                null,
+                0,
+                0,
+                null
+        );
+
+        boolean creationPaid = CONFIG.getBoolean("warp-creation-cost.enabled", false);
+        double price = creationPaid ? CONFIG.getDouble("warp-creation-cost.price", 1000) : 0;
+
+        AxPlayerWarpsPreCreateEvent preCreateEvent = new AxPlayerWarpsPreCreateEvent(sender, warp, price);
+        Bukkit.getServer().getPluginManager().callEvent(preCreateEvent);
+        if (preCreateEvent.isCancelled()) return;
+        price = preCreateEvent.getCreationPrice();
+
         CurrencyHook currencyHook;
-        if (CONFIG.getBoolean("warp-creation-cost.enabled", false)) {
-            price = CONFIG.getDouble("warp-creation-cost.price", 1000);
+        if (creationPaid & price > 0) {
             String currStr = CONFIG.getString("warp-creation-cost.currency", "Experience");
             currencyHook = HookManager.getCurrencyHook(currStr);
             if (currencyHook != null) {
@@ -98,14 +122,16 @@ public enum Create {
             }
         } else {
             currencyHook = null;
-            price = 0;
         }
 
+        AxPlayerWarpsCreateEvent createEvent = new AxPlayerWarpsCreateEvent(sender, warp, price);
+        Bukkit.getServer().getPluginManager().callEvent(createEvent);
+
+        final double finalPrice = price;
         AxPlayerWarps.getThreadedQueue().submit(() -> {
-            OfflinePlayer usedPlayer = setPlayer == null ? sender : setPlayer;
-            int id = AxPlayerWarps.getDatabase().createWarp(usedPlayer, warpLocation, warpName);
-            Warp warp = new Warp(id, System.currentTimeMillis(), null, warpName, warpLocation, warpLocation.getWorld().getName(), null, usedPlayer.getUniqueId(), usedPlayer.getName(), Access.PUBLIC, null, 0, 0, null);
-            MESSAGEUTILS.sendLang(sender, "create.created", Map.of("%warp%", warpName, "%price%", FormatUtils.formatCurrency(currencyHook, price)));
+            int id = AxPlayerWarps.getDatabase().createWarp(sender, warpLocation, warpName);
+            warp.setId(id);
+            MESSAGEUTILS.sendLang(sender, "create.created", Map.of("%warp%", warpName, "%price%", FormatUtils.formatCurrency(currencyHook, finalPrice)));
             WarpManager.getWarps().add(warp);
         });
     }
