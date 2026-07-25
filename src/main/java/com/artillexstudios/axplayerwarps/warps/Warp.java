@@ -37,7 +37,7 @@ import static com.artillexstudios.axplayerwarps.AxPlayerWarps.CONFIG;
 import static com.artillexstudios.axplayerwarps.AxPlayerWarps.MESSAGEUTILS;
 
 public class Warp {
-    private int id;
+    private Integer id;
     private UUID owner;
     private String ownerName;
     private Location location;
@@ -67,7 +67,6 @@ public class Warp {
         location.setY(location.getBlockY());
         location.setZ(location.getBlockZ());
         location.add(0.5, 0, 0.5);
-        this.id = id;
         this.created = created;
         this.description = description;
         this.name = name;
@@ -81,15 +80,7 @@ public class Warp {
         this.teleportPrice = teleportPrice;
         this.earnedMoney = earnedMoney;
         this.icon = icon;
-
-        AxPlayerWarps.getThreadedQueue().submit(() -> {
-            favorites = AxPlayerWarps.getDatabase().getFavorites(this);
-            rating = AxPlayerWarps.getDatabase().getAllRatings(this);
-            visits = AxPlayerWarps.getDatabase().getVisits(this);
-            visitors = AxPlayerWarps.getDatabase().getVisitors(this);
-            whitelisted = AxPlayerWarps.getDatabase().getAccessList(this, AccessList.WHITELIST);
-            blacklisted = AxPlayerWarps.getDatabase().getAccessList(this, AccessList.BLACKLIST);
-        });
+        if (id != null) setId(id);
     }
 
     public void reload() {
@@ -102,6 +93,14 @@ public class Warp {
 
     public void setId(int id) {
         this.id = id;
+        AxPlayerWarps.getThreadedQueue().submit(() -> {
+            favorites = AxPlayerWarps.getDatabase().getFavorites(this);
+            rating = AxPlayerWarps.getDatabase().getAllRatings(this);
+            visits = AxPlayerWarps.getDatabase().getVisits(this);
+            visitors = AxPlayerWarps.getDatabase().getVisitors(this);
+            whitelisted = AxPlayerWarps.getDatabase().getAccessList(this, AccessList.WHITELIST);
+            blacklisted = AxPlayerWarps.getDatabase().getAccessList(this, AccessList.BLACKLIST);
+        });
     }
 
     public UUID getOwner() {
