@@ -56,6 +56,7 @@ public class InputManager {
                     if (ended.get()) return;
                     if (clickEvent.getSlot() != 2) return;
                     ItemStack item = clickEvent.getInventory().getItem(2);
+                    if (item == null) return;
                     String res = item.getItemMeta().getDisplayName();
                     clickEvent.getInventory().clear();
                     Scheduler.get().run(player, task -> consumer.accept(res), () -> {});
