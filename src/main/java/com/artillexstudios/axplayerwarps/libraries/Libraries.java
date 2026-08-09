@@ -17,9 +17,9 @@ public enum Libraries {
 
     HIKARICP("com{}zaxxer:HikariCP:7.1.0", relocation("com{}zaxxer{}hikari", "com.artillexstudios.axplayerwarps.libs.hikari")),
 
-    MYSQL_CONNECTOR("com{}mysql:mysql-connector-j:9.2.0", relocation("com{}mysql", "com.artillexstudios.axplayerwarps.libs.mysql")),
+    MYSQL_CONNECTOR("com{}mysql:mysql-connector-j:9.7.0", relocation("com{}mysql", "com.artillexstudios.axplayerwarps.libs.mysql")),
 
-    SQLITE("org{}xerial:sqlite-jdbc:3.49.1.0"),
+//    SQLITE("org{}xerial:sqlite-jdbc:3.49.1.0"),
 
     H2_JDBC("com{}h2database:h2:2.1.214"),
 

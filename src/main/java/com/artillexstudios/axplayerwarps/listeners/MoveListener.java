@@ -15,7 +15,7 @@ public class MoveListener implements Listener {
         if (!WarpQueue.getQueue().containsKey(event.getPlayer())) return;
         // using distanceSquared to avoid heavy Math.sqrt call
         if (event.getFrom().distanceSquared(event.getTo()) < 0.005) return;
-        WarpQueue.getQueue().remove(event.getPlayer());
+        WarpQueue.remove(event.getPlayer());
         MESSAGEUTILS.sendLang(event.getPlayer(), "errors.moved");
     }
 }

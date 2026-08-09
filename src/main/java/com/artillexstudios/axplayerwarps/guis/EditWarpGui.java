@@ -2,7 +2,7 @@ package com.artillexstudios.axplayerwarps.guis;
 
 import com.artillexstudios.axapi.config.Config;
 import com.artillexstudios.axapi.items.WrappedItemStack;
-import com.artillexstudios.axapi.items.component.DataComponents;
+import com.artillexstudios.axapi.items.components.DataComponents;
 import com.artillexstudios.axapi.libs.boostedyaml.settings.dumper.DumperSettings;
 import com.artillexstudios.axapi.libs.boostedyaml.settings.general.GeneralSettings;
 import com.artillexstudios.axapi.libs.boostedyaml.settings.loader.LoaderSettings;
@@ -16,13 +16,12 @@ import com.artillexstudios.axguiframework.actions.GuiActions;
 import com.artillexstudios.axguiframework.item.AxGuiItem;
 import com.artillexstudios.axguiframework.libs.gui.guis.Gui;
 import com.artillexstudios.axguiframework.replacements.Replacements;
+import com.artillexstudios.axintegrations.types.CurrencyIntegration;
 import com.artillexstudios.axplayerwarps.AxPlayerWarps;
 import com.artillexstudios.axplayerwarps.category.Category;
 import com.artillexstudios.axplayerwarps.category.CategoryManager;
 import com.artillexstudios.axplayerwarps.enums.Access;
 import com.artillexstudios.axplayerwarps.enums.AccessList;
-import com.artillexstudios.axplayerwarps.hooks.HookManager;
-import com.artillexstudios.axplayerwarps.hooks.currency.CurrencyHook;
 import com.artillexstudios.axplayerwarps.input.InputManager;
 import com.artillexstudios.axplayerwarps.user.Users;
 import com.artillexstudios.axplayerwarps.user.WarpUser;
@@ -44,7 +43,7 @@ import java.util.UUID;
 import static com.artillexstudios.axplayerwarps.AxPlayerWarps.CONFIG;
 import static com.artillexstudios.axplayerwarps.AxPlayerWarps.MESSAGEUTILS;
 
-public class EditWarpGui extends GuiFrame {
+public class EditWarpGui extends GuiFrame<Gui> {
     private static final Config GUI = new Config(new File(AxPlayerWarps.getInstance().getDataFolder(), "guis/edit-warp.yml"),
             AxPlayerWarps.getInstance().getResource("guis/edit-warp.yml"),
             GeneralSettings.builder().setUseDefaults(false).build(),
@@ -61,14 +60,17 @@ public class EditWarpGui extends GuiFrame {
         super(GUI.getInt("auto-update-ticks", -1), GUI, player);
         this.user = Users.get(player);
         this.warp = warp;
-        this.gui = Gui.gui()
-            .disableAllInteractions()
-            .title(StringUtils.format(GUI.getString("title", ""), Map.of("%warp%", warp.getName())))
-            .rows(GUI.getInt("rows", 5))
-            .create();
 
+        gui = Gui.gui()
+                .disableAllInteractions()
+                .title(Component.empty())
+                .rows(GUI.getInt("rows", 5))
+                .create();
+
+        addReplacement(new Replacements("%warp%", warp.getName()));
         addPlaceholderParameter(warp);
-        setGui(gui);
+
+        setGui(gui, () -> parseText(GUI.getString("title", "")));
         user.addGui(this);
 
         gui.setPlayerInventoryAction(event -> {
@@ -219,8 +221,8 @@ public class EditWarpGui extends GuiFrame {
         createItem("price", event -> {
             GuiActions.run(player, this, event, section.getStringList("price.actions"));
             if (warp.getEarnedMoney() > 0) warp.withdrawMoney();
-            CurrencyHook currency = warp.getCurrency();
-            ArrayList<CurrencyHook> currencies = HookManager.getCurrency();
+            CurrencyIntegration currency = warp.getCurrencyIntegration();
+            List<CurrencyIntegration> currencies = CurrencyIntegration.list();
             int idx = currency == null ? -1 : currencies.indexOf(currency);
             if (event.isLeftClick()) {
                 if (event.isShiftClick()) {
@@ -262,7 +264,9 @@ public class EditWarpGui extends GuiFrame {
             if (event.isShiftClick() && event.isRightClick()) {
                 GuiActions.run(player, this, event, section.getStringList("delete.actions"));
                 warp.delete();
-                Scheduler.get().runLaterAt(player.getLocation(), () -> player.closeInventory(), 1);
+                Scheduler.get().runLaterAt(player.getLocation(), () -> {
+                    player.closeInventory();
+                }, 1);
             }
         });
 
@@ -276,7 +280,7 @@ public class EditWarpGui extends GuiFrame {
         WrappedItemStack wrap = WrappedItemStack.wrap(builder.get());
         List<String> lore = new ArrayList<>();
         String[] description = warp.getDescription().split("\n", CONFIG.getInt("warp-description.max-lines", 3));
-        for (Component line : wrap.get(DataComponents.lore()).lines()) {
+        for (Component line : wrap.get(DataComponents.LORE).lines()) {
             String serialized = StringUtils.MINI_MESSAGE.serialize(line);
             if (serialized.contains("%description%")) {
                 for (String s : description) {

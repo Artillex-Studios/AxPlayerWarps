@@ -57,15 +57,20 @@ public class InputManager {
                     if (clickEvent.getSlot() != 2) return;
                     ItemStack item = clickEvent.getInventory().getItem(2);
                     if (item == null) return;
+                    ended.set(true);
                     String res = item.getItemMeta().getDisplayName();
                     clickEvent.getInventory().clear();
-                    Scheduler.get().run(player, task -> consumer.accept(res), () -> {});
-                    ended.set(true);
+                    clickEvent.getWhoClicked().closeInventory();
+                    Scheduler.get().run(player, task -> {
+                        consumer.accept(res);
+                    }, () -> {});
                 },
                 closeEvent -> {
-                    closeEvent.getInventory().clear();
                     if (ended.get()) return;
-                    Scheduler.get().run(player, task -> consumer.accept(""), () -> {});
+                    closeEvent.getPlayer().closeInventory();
+                    Scheduler.get().run(player, task -> {
+                        consumer.accept("");
+                    }, () -> {});
                 }
         ).open();
     }

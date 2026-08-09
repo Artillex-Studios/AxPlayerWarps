@@ -7,13 +7,13 @@ import org.bukkit.entity.Player;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Objects;
-import java.util.WeakHashMap;
+import java.util.concurrent.ConcurrentHashMap;
 
 import static com.artillexstudios.axplayerwarps.AxPlayerWarps.CONFIG;
 import static com.artillexstudios.axplayerwarps.AxPlayerWarps.MESSAGEUTILS;
 
 public class WarpQueue {
-    private static final Map<Player, TeleportData> queue = new WeakHashMap<>();
+    private static final Map<Player, TeleportData> queue = new ConcurrentHashMap<>();
     private static final Cooldown<Player> cooldown = Cooldown.create();
 
     public static void start() {
@@ -56,5 +56,9 @@ public class WarpQueue {
 
     public static Map<Player, TeleportData> getQueue() {
         return queue;
+    }
+
+    public static void remove(Player player) {
+        queue.remove(player);
     }
 }

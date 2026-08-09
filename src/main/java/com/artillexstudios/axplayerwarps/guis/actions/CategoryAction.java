@@ -17,7 +17,10 @@ public class CategoryAction extends Action {
     @Override
     public void run(Player player, GuiFrame gui, InventoryClickEvent event, String arguments) {
         Category category = CategoryManager.getCategories().get(arguments);
-        if (category == null) new WarpsGui(player).open();
-        else new WarpsGui(player, category).open();
+        if (category == null) {
+            new WarpsGui(player).open();
+        } else {
+            new WarpsGui(player, category, null).open();
+        }
     }
 }

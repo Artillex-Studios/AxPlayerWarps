@@ -11,6 +11,7 @@ import com.artillexstudios.axapi.utils.StringUtils;
 import com.artillexstudios.axguiframework.GuiFrame;
 import com.artillexstudios.axguiframework.actions.GuiActions;
 import com.artillexstudios.axguiframework.libs.gui.guis.Gui;
+import com.artillexstudios.axguiframework.replacements.Replacements;
 import com.artillexstudios.axplayerwarps.AxPlayerWarps;
 import com.artillexstudios.axplayerwarps.input.InputManager;
 import com.artillexstudios.axplayerwarps.user.Users;
@@ -24,7 +25,7 @@ import java.util.Map;
 
 import static com.artillexstudios.axplayerwarps.AxPlayerWarps.MESSAGEUTILS;
 
-public class RateWarpGui extends GuiFrame {
+public class RateWarpGui extends GuiFrame<Gui> {
     private static final Config GUI = new Config(new File(AxPlayerWarps.getInstance().getDataFolder(), "guis/rate-warp.yml"),
             AxPlayerWarps.getInstance().getResource("guis/rate-warp.yml"),
             GeneralSettings.builder().setUseDefaults(false).build(),
@@ -33,7 +34,6 @@ public class RateWarpGui extends GuiFrame {
             UpdaterSettings.builder().build()
     );
 
-    private final Gui gui;
     private final Warp warp;
     private final WarpUser user;
 
@@ -47,8 +47,10 @@ public class RateWarpGui extends GuiFrame {
             .rows(GUI.getInt("rows", 5))
             .create();
 
+        addReplacement(new Replacements("%warp%", warp.getName()));
         addPlaceholderParameter(warp);
-        setGui(gui);
+
+        setGui(gui, () -> parseText(GUI.getString("title", "")));
         user.addGui(this);
     }
 

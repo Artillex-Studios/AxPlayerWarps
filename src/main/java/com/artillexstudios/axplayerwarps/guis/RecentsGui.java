@@ -8,11 +8,10 @@ import com.artillexstudios.axapi.libs.boostedyaml.settings.updater.UpdaterSettin
 import com.artillexstudios.axapi.nms.wrapper.ServerPlayerWrapper;
 import com.artillexstudios.axapi.scheduler.Scheduler;
 import com.artillexstudios.axapi.utils.ItemBuilder;
-import com.artillexstudios.axapi.utils.StringUtils;
-import com.artillexstudios.axguiframework.GuiFrame;
+import com.artillexstudios.axguiframework.PaginatedGuiFrame;
 import com.artillexstudios.axguiframework.item.AxGuiItem;
 import com.artillexstudios.axguiframework.libs.gui.guis.Gui;
-import com.artillexstudios.axguiframework.libs.gui.guis.PaginatedGui;
+import com.artillexstudios.axguiframework.replacements.Replacements;
 import com.artillexstudios.axplayerwarps.AxPlayerWarps;
 import com.artillexstudios.axplayerwarps.user.Users;
 import com.artillexstudios.axplayerwarps.user.WarpUser;
@@ -25,14 +24,12 @@ import org.bukkit.inventory.ItemStack;
 
 import java.io.File;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 
 import static com.artillexstudios.axplayerwarps.AxPlayerWarps.CONFIG;
 
-public class RecentsGui extends GuiFrame {
+public class RecentsGui extends PaginatedGuiFrame {
         private static final Config GUI = new Config(new File(AxPlayerWarps.getInstance().getDataFolder(), "guis/recents.yml"),
             AxPlayerWarps.getInstance().getResource("guis/recents.yml"),
             GeneralSettings.builder().setUseDefaults(false).build(),
@@ -41,26 +38,26 @@ public class RecentsGui extends GuiFrame {
             UpdaterSettings.builder().build()
     );
 
-    private final PaginatedGui gui;
     private final WarpUser user;
 
     public RecentsGui(Player player) {
         super(GUI.getInt("auto-update-ticks", -1), GUI, player);
         this.user = Users.get(player);
-        this.gui = Gui.paginated()
-            .disableAllInteractions()
-            .title(Component.empty())
-            .rows(GUI.getInt("rows", 5))
-            .pageSize(GUI.getInt("page-size", 21))
-            .create();
 
-        setGui(gui);
+        gui = Gui.paginated()
+                .disableAllInteractions()
+                .title(Component.empty())
+                .rows(GUI.getInt("rows", 5))
+                .pageSize(GUI.getInt("page-size", 27))
+                .create();
+
+        addReplacement(new Replacements("%page%", () -> String.valueOf(gui.getCurrentPageNum())));
+        addReplacement(new Replacements("%current_page%", () -> String.valueOf(gui.getCurrentPageNum())));
+        addReplacement(new Replacements("%max_page%", () -> String.valueOf(gui.getPagesNum())));
+        addReplacement(new Replacements("%pages%", () -> String.valueOf(gui.getPagesNum())));
+
+        setGui(gui, () -> parseText(GUI.getString("title", "")));
         user.addGui(this);
-    }
-
-    @Override
-    public void updateTitle() {
-        gui.updateTitle(StringUtils.format(GUI.getString("title", ""), new HashMap<>(Map.of("%page%", "" + gui.getCurrentPageNum(), "%pages%", "" + Math.max(1, gui.getPagesNum())))));
     }
 
     public static boolean reload() {

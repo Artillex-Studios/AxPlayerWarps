@@ -3,15 +3,19 @@ package com.artillexstudios.axplayerwarps.warps;
 import com.artillexstudios.axplayerwarps.AxPlayerWarps;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 public class WarpManager {
-    private static final ArrayList<Warp> warps = new ArrayList<>();
+    private static final List<Warp> warps = Collections.synchronizedList(new ArrayList<>());
 
     public static void load() {
-        AxPlayerWarps.getThreadedQueue().submit(() -> AxPlayerWarps.getDatabase().loadWarps());
+        AxPlayerWarps.getThreadedQueue().submit(() -> {
+            AxPlayerWarps.getDatabase().loadWarps();
+        });
     }
 
-    public static ArrayList<Warp> getWarps() {
+    public static List<Warp> getWarps() {
         return warps;
     }
 }

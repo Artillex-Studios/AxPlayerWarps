@@ -4,7 +4,6 @@ import com.artillexstudios.axapi.utils.Pair;
 import com.artillexstudios.axplayerwarps.category.Category;
 import com.artillexstudios.axplayerwarps.database.impl.Base;
 import com.artillexstudios.axplayerwarps.enums.AccessList;
-import com.artillexstudios.axplayerwarps.hooks.currency.CurrencyHook;
 import com.artillexstudios.axplayerwarps.warps.Warp;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -51,7 +50,7 @@ public interface Database {
 
     int getCurrencyId(String currency);
 
-    CurrencyHook getCurrencyFromId(int id);
+    String getCurrencyFromId(int id);
 
     int getMaterialId(Material material);
 

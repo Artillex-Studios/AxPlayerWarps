@@ -17,15 +17,15 @@ public class BackAction extends Action {
     }
 
     @Override
-    public void run(Player player, GuiFrame gui, InventoryClickEvent event, String arguments) {
+    public void run(Player player, GuiFrame<?> gui, InventoryClickEvent event, String arguments) {
         WarpUser user = Users.get(player);
-        CircularFifoQueue<GuiFrame> last = user.getLastGuis();
+        CircularFifoQueue<GuiFrame<?>> last = user.getLastGuis();
 
-        GuiFrame lastEl = last.get(last.size() - 1);
+        GuiFrame<?> lastEl = last.get(last.size() - 1);
         if (lastEl == null) return;
         last.remove(lastEl);
 
-        GuiFrame secondLastEl;
+        GuiFrame<?> secondLastEl;
         try {
             secondLastEl = last.get(last.size() - 1);
         } catch (NoSuchElementException ex) {

@@ -32,9 +32,13 @@ public class InputListener implements Listener {
         if (consumer == null) return;
         event.setCancelled(true);
         if (INPUT.getStringList("chat-cancel-words").contains(event.getMessage())) {
-            Scheduler.get().run(event.getPlayer(), task -> consumer.accept(""), () -> {});
+            Scheduler.get().run(event.getPlayer(), task -> {
+                consumer.accept("");
+            }, () -> {});
             return;
         }
-        Scheduler.get().run(event.getPlayer(), task -> consumer.accept(event.getMessage()), () -> {});
+        Scheduler.get().run(event.getPlayer(), task -> {
+            consumer.accept(event.getMessage());
+        }, () -> {});
     }
 }

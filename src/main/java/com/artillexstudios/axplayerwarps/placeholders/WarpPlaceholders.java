@@ -6,9 +6,11 @@ import com.artillexstudios.axapi.placeholders.PlaceholderContext;
 import com.artillexstudios.axapi.placeholders.PlaceholderHandler;
 import com.artillexstudios.axapi.placeholders.exception.PlaceholderException;
 import com.artillexstudios.axapi.utils.functions.ThrowingFunction;
+import com.artillexstudios.axintegrations.types.CurrencyIntegration;
 import com.artillexstudios.axplayerwarps.AxPlayerWarps;
 import com.artillexstudios.axplayerwarps.database.impl.Base;
 import com.artillexstudios.axplayerwarps.enums.AccessList;
+import com.artillexstudios.axplayerwarps.hooks.HookManager;
 import com.artillexstudios.axplayerwarps.placeholders.resolvers.WarpResolver;
 import com.artillexstudios.axplayerwarps.user.Users;
 import com.artillexstudios.axplayerwarps.user.WarpUser;
@@ -173,14 +175,17 @@ public class WarpPlaceholders {
             Warp warp = getWarp(handler);
             if (warp == null) return empty;
             double price = warp.getCurrency() == null ? 0 : warp.getTeleportPrice();
-            boolean isFree = warp.getCurrency() == null || warp.getTeleportPrice() == 0;
-            return isFree ? LANG.getString("placeholders.free") : warp.getCurrency().getDisplayName().replace("%price%", format(price));
+            HookManager.CurrencyOptions options = warp.getCurrencyOptions();
+            boolean isFree = options == null || warp.getTeleportPrice() == 0;
+            return isFree ? LANG.getString("placeholders.free") : options.displayName().replace("%price%", format(price));
         });
 
         registerWarp("price-full", handler -> {
             Warp warp = getWarp(handler);
             if (warp == null) return empty;
-            return FormatUtils.formatCurrency(warp.getCurrency(), warp.getTeleportPrice());
+            CurrencyIntegration integration = warp.getCurrencyIntegration();
+            if (integration == null) return "0";
+            return FormatUtils.formatCurrency(integration, warp.getTeleportPrice());
         });
 
         registerWarp("access", handler -> {
@@ -192,8 +197,10 @@ public class WarpPlaceholders {
         registerWarp("earned_money", handler -> {
             Warp warp = getWarp(handler);
             if (warp == null) return empty;
+            CurrencyIntegration integration = warp.getCurrencyIntegration();
+            if (integration == null) return "0";
             double earned = warp.getEarnedMoney();
-            return FormatUtils.formatCurrency(warp.getCurrency(), earned);
+            return FormatUtils.formatCurrency(integration, earned);
         });
 
         registerWarp("rating_decimal", handler -> {

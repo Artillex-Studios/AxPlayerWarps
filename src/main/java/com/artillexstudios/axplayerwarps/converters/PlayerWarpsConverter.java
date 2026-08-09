@@ -14,10 +14,11 @@ import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.util.HashSet;
+import java.util.Set;
 import java.util.UUID;
 
-public class PlayerWarpsConverter implements ConverterBase {
-    private final String url = "jdbc:sqlite:" + "plugins/PlayerWarps/data/database.db";
+public class PlayerWarpsConverter implements Converter {
+    private final String url = "jdbc:sqlite:plugins/PlayerWarps/data/database.db";
 
     public Connection getConnection() {
         try {
@@ -30,8 +31,8 @@ public class PlayerWarpsConverter implements ConverterBase {
 
     @Override
     public void run() {
-        final String sql = "SELECT name, uuid, world, x, y, z, pitch, yaw, description, date FROM playerwarps_warps;";
-        HashSet<OfflinePlayer> players = new HashSet<>();
+        String sql = "SELECT name, uuid, world, x, y, z, pitch, yaw, description, date FROM playerwarps_warps;";
+        Set<OfflinePlayer> players = new HashSet<>();
         int warps = 0;
         try (PreparedStatement stmt = getConnection().prepareStatement(sql)) {
             try (ResultSet rs = stmt.executeQuery()) {

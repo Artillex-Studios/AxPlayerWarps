@@ -6,8 +6,6 @@ import com.artillexstudios.axplayerwarps.category.CategoryManager;
 import com.artillexstudios.axplayerwarps.database.Database;
 import com.artillexstudios.axplayerwarps.enums.Access;
 import com.artillexstudios.axplayerwarps.enums.AccessList;
-import com.artillexstudios.axplayerwarps.hooks.HookManager;
-import com.artillexstudios.axplayerwarps.hooks.currency.CurrencyHook;
 import com.artillexstudios.axplayerwarps.user.Users;
 import com.artillexstudios.axplayerwarps.user.WarpUser;
 import com.artillexstudios.axplayerwarps.utils.ThreadUtils;
@@ -397,8 +395,9 @@ public class Base implements Database {
                 currency)
         ) {
             try (ResultSet rs = stmt.executeQuery()) {
-                if (rs.next()) return rs.getInt(1);
-                else {
+                if (rs.next()) {
+                    return rs.getInt(1);
+                } else {
                     return insert("INSERT INTO axplayerwarps_currencies (currency) VALUES (?)", currency);
                 }
             }
@@ -409,14 +408,16 @@ public class Base implements Database {
     }
 
     @Nullable
-    public CurrencyHook getCurrencyFromId(int id) {
+    public String getCurrencyFromId(int id) {
         ThreadUtils.checkNotMain("This method can only be called async!");
         try (Connection conn = getConnection(); PreparedStatement stmt = createStatement(conn,
                 "SELECT currency FROM axplayerwarps_currencies WHERE id = ?",
                 id)
         ) {
             try (ResultSet rs = stmt.executeQuery()) {
-                if (rs.next()) return HookManager.getCurrencyHook(rs.getString(1));
+                if (rs.next()) {
+                    return rs.getString(1);
+                }
             }
         } catch (SQLException ex) {
             ex.printStackTrace();
@@ -513,7 +514,7 @@ public class Base implements Database {
                 warp.getDescription(),
                 warp.getCategory() == null ? null : getCategoryId(warp.getCategory().raw()),
                 warp.getIcon() == null ? null : getMaterialId(warp.getIcon()),
-                warp.getCurrency() == null ? null : getCurrencyId(warp.getCurrency().getName()),
+                warp.getCurrency() == null ? null : getCurrencyId(warp.getCurrencyIntegration().getName()),
                 warp.getTeleportPrice(),
                 warp.getEarnedMoney(),
                 warp.getAccess().ordinal(),
@@ -904,9 +905,9 @@ public class Base implements Database {
                         category = getCategoryFromId(rs.getInt("category_id"));
                     }
 
-                    CurrencyHook currencyHook = null;
+                    String currency = null;
                     if (rs.getString("currency_id") != null) {
-                        currencyHook = getCurrencyFromId(rs.getInt("currency_id"));
+                        currency = getCurrencyFromId(rs.getInt("currency_id"));
                     }
 
                     Material material = null;
@@ -928,7 +929,7 @@ public class Base implements Database {
                             player.getKey(),
                             player.getValue(),
                             Access.values()[rs.getInt("access")],
-                            currencyHook,
+                            currency,
                             rs.getDouble("price"),
                             rs.getDouble("earned_money"),
                             material

@@ -117,7 +117,7 @@ public enum Reload {
         Bukkit.getConsoleSender().sendMessage(StringUtils.formatToString("&#33EEBB╠ &#99FFDDReloaded &fguis/my-warps.yml&#99FFDD!"));
 
         WarpPlaceholders.reload();
-        HookManager.updateHooks(false);
+        HookManager.updateHooks();
         WorldManager.reload();
         CategoryManager.reload();
         SortingManager.reload();

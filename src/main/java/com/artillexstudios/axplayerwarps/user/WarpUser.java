@@ -20,7 +20,7 @@ public class WarpUser {
     private final Player player;
     private int sortingIdx = 0;
     private int categoryIdx = -1;
-    private final CircularFifoQueue<GuiFrame> lastGuis = new CircularFifoQueue<>(5);
+    private final CircularFifoQueue<GuiFrame<?>> lastGuis = new CircularFifoQueue<>(5);
     private List<Warp> favorites = Collections.synchronizedList(new ArrayList<>());
 
     public WarpUser(Player player) {
@@ -64,11 +64,11 @@ public class WarpUser {
         return CategoryManager.getCategories().values().stream().toList().get((a % b + b) % b);
     }
 
-    public CircularFifoQueue<GuiFrame> getLastGuis() {
+    public CircularFifoQueue<GuiFrame<?>> getLastGuis() {
         return lastGuis;
     }
 
-    public void addGui(GuiFrame guiFrame) {
+    public void addGui(GuiFrame<?> guiFrame) {
         lastGuis.add(guiFrame);
 //        System.out.println("add: " + lastGuis.size() + " " + guiFrame);
     }

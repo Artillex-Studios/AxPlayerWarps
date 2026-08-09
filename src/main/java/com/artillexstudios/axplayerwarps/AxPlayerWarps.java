@@ -14,7 +14,9 @@ import com.artillexstudios.axapi.utils.AsyncUtils;
 import com.artillexstudios.axapi.utils.MessageUtils;
 import com.artillexstudios.axapi.utils.StringUtils;
 import com.artillexstudios.axapi.utils.featureflags.FeatureFlags;
+import com.artillexstudios.axapi.utils.logging.LoggerNameFormat;
 import com.artillexstudios.axguiframework.GuiManager;
+import com.artillexstudios.axguiframework.GuiUpdater;
 import com.artillexstudios.axplayerwarps.category.CategoryManager;
 import com.artillexstudios.axplayerwarps.commands.CommandManager;
 import com.artillexstudios.axplayerwarps.database.Database;
@@ -148,14 +150,18 @@ public final class AxPlayerWarps extends AxPlugin {
     public void disable() {
         if (metrics != null) metrics.cancel();
         database.disable();
+        GuiUpdater.stop();
         AsyncUtils.stop();
+        threadedQueue.stop();
     }
 
     public void updateFlags() {
-        FeatureFlags.USE_LEGACY_HEX_FORMATTER.set(true);
-        FeatureFlags.ASYNC_UTILS_POOL_SIZE.set(3);
-        FeatureFlags.ENABLE_PACKET_LISTENERS.set(true);
+        Config config = new Config(new File(getDataFolder(), "config.yml"));
+        FeatureFlags.USE_LEGACY_HEX_FORMATTER.set(false);
         FeatureFlags.PLACEHOLDER_API_HOOK.set(true);
         FeatureFlags.PLACEHOLDER_API_IDENTIFIER.set("axplayerwarps");
+        FeatureFlags.ASYNC_UTILS_POOL_SIZE.set(config.getInt("gui-loading-threads", 2));
+        FeatureFlags.ENABLE_PACKET_LISTENERS.set(true);
+        FeatureFlags.LOGGER_NAME_FORMAT.set(LoggerNameFormat.NAMEABLE);
     }
 }

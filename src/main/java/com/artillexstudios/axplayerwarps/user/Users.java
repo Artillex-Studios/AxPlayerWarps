@@ -3,28 +3,22 @@ package com.artillexstudios.axplayerwarps.user;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.WeakHashMap;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class Users {
-    private static final WeakHashMap<Player, WarpUser> players = new WeakHashMap<>();
+    private static final Map<Player, WarpUser> players = new ConcurrentHashMap<>();
 
-    public static WeakHashMap<Player, WarpUser> getPlayers() {
+    public static Map<Player, WarpUser> getPlayers() {
         return players;
+    }
+
+    public static void remove(Player player) {
+        players.remove(player);
     }
 
     @NotNull
     public static WarpUser get(Player player) {
-        WarpUser user = players.get(player);
-        if (user != null) return user;
-        user = create(player);
-        players.put(player, user);
-        return user;
-    }
-
-    @NotNull
-    public static WarpUser create(Player player) {
-        WarpUser user = new WarpUser(player);
-        players.put(player, user);
-        return user;
+        return players.computeIfAbsent(player, WarpUser::new);
     }
 }

@@ -2,11 +2,12 @@
 
 # you can create your own currencies by using placeholders
 # make sure that none of the placeholders have any formatting on them
+# note: placeholder currencies lack success confirmations that some plugins provide, if possible, always use regular integrations
 # requires PlaceholderAPI
 placeholder-currencies:
   Example-Currency:
     register: false
-    name: "money"
+    name: '%price% money'
     # if the currency uses whole numbers, then disable this
     # 100.5 - true
     # 100 - false
@@ -18,71 +19,10 @@ placeholder-currencies:
       give-command: "eco give %player% %price%"
       take-command: "eco take %player% %price%"
 
-# INFO FOR MULTI CURRENCY PLUGINS: (like: coinsengine, excellenteconomy, ultraeconomy, rediseconomy)
+# list of supported plugins: https://docs.artillex-studios.com/integrations.html#currency
+# for multi currency plugins:
 # - you can enable as many currencies as you want, just add the sections the same way as in the example
 currencies:
-  Experience:
-    register: true
-    name: "%price% exp"
-  Vault:
-    register: true
-    name: "%price% money"
-  PlayerPoints:
-    register: true
-    name: "%price% points"
-  RoyaleEconomy:
-    register: true
-    name: "%price% money"
-  CoinsEngine:
-    register: true
-    enabled:
-      - currency-name: "coins"
-        name: "%price% coins"
-      - currency-name: "money"
-        name: "%price% money"
-  ExcellentEconomy:
-    register: true
-    enabled:
-      - currency-name: "coins"
-        name: "%price% coins"
-      - currency-name: "money"
-        name: "%price% money"
-  UltraEconomy:
-    register: true
-    enabled:
-      - currency-name: "coins"
-        name: "%price% coins"
-  KingdomsX:
-    register: true
-    name: "%price% nexus points"
-  RivalHarvesterHoes:
-    register: true
-    name: "%price% essence"
-  SuperMobCoins:
-    register: true
-    name: "%price% mobcoin"
-  TheOnly-MobCoins:
-    register: true
-    name: "%price% mobcoins"
-  TokenManager:
-    register: true
-    name: "%price% tokens"
-  AxQuestBoard:
-    register: true
-    name: "%price% quest points"
-  RedisEconomy:
-    register: true
-    enabled:
-      - currency-name: "coins"
-        name: "%price% coins"
-  BeastTokens:
-    register: true
-    name: "%price% tokens"
-  EcoBits:
-    register: true
-    enabled:
-      - currency-name: "crystals"
-        name: "%price% crystals"
 
 # do not change this
 version: 2

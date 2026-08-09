@@ -9,12 +9,10 @@ import com.artillexstudios.axapi.nms.wrapper.ServerPlayerWrapper;
 import com.artillexstudios.axapi.scheduler.Scheduler;
 import com.artillexstudios.axapi.utils.AsyncUtils;
 import com.artillexstudios.axapi.utils.ItemBuilder;
-import com.artillexstudios.axapi.utils.StringUtils;
-import com.artillexstudios.axguiframework.GuiFrame;
+import com.artillexstudios.axguiframework.PaginatedGuiFrame;
 import com.artillexstudios.axguiframework.actions.GuiActions;
 import com.artillexstudios.axguiframework.item.AxGuiItem;
 import com.artillexstudios.axguiframework.libs.gui.guis.Gui;
-import com.artillexstudios.axguiframework.libs.gui.guis.PaginatedGui;
 import com.artillexstudios.axguiframework.replacements.Replacements;
 import com.artillexstudios.axplayerwarps.AxPlayerWarps;
 import com.artillexstudios.axplayerwarps.category.Category;
@@ -29,10 +27,10 @@ import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
+import org.jetbrains.annotations.Nullable;
 
 import java.io.File;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -42,7 +40,7 @@ import static com.artillexstudios.axplayerwarps.AxPlayerWarps.CONFIG;
 import static com.artillexstudios.axplayerwarps.AxPlayerWarps.LANG;
 import static com.artillexstudios.axplayerwarps.AxPlayerWarps.MESSAGEUTILS;
 
-public class MyWarpsGui extends GuiFrame {
+public class MyWarpsGui extends PaginatedGuiFrame {
     private static final Config GUI = new Config(new File(AxPlayerWarps.getInstance().getDataFolder(), "guis/my-warps.yml"),
             AxPlayerWarps.getInstance().getResource("guis/my-warps.yml"),
             GeneralSettings.builder().setUseDefaults(false).build(),
@@ -51,35 +49,35 @@ public class MyWarpsGui extends GuiFrame {
             UpdaterSettings.builder().build()
     );
 
-    private final PaginatedGui gui = Gui
-            .paginated()
-            .disableAllInteractions()
-            .title(Component.empty())
-            .rows(GUI.getInt("rows", 5))
-            .pageSize(GUI.getInt("page-size", 27))
-            .create();
-
     private Category category = null;
     private String search = null;
     private final WarpUser user;
 
-    public MyWarpsGui(Player player, Category category, String search) {
-        this(player, category);
-        this.search = search;
-    }
-
-    public MyWarpsGui(Player player, Category category) {
+    public MyWarpsGui(Player player, Category category, @Nullable String search) {
         this(player);
         this.category = category;
+        this.search = search;
     }
 
     public MyWarpsGui(Player player) {
         super(GUI.getInt("auto-update-ticks", -1), GUI, player);
         this.user = Users.get(player);
 
+        gui = Gui.paginated()
+                .disableAllInteractions()
+                .title(Component.empty())
+                .rows(GUI.getInt("rows", 5))
+                .pageSize(GUI.getInt("page-size", 27))
+                .create();
+
+        addReplacement(new Replacements("%page%", () -> String.valueOf(gui.getCurrentPageNum())));
+        addReplacement(new Replacements("%current_page%", () -> String.valueOf(gui.getCurrentPageNum())));
+        addReplacement(new Replacements("%max_page%", () -> String.valueOf(gui.getPagesNum())));
+        addReplacement(new Replacements("%pages%", () -> String.valueOf(gui.getPagesNum())));
         addReplacement(new Replacements("%search%", () -> search == null ? LANG.getString("placeholders.no-search") : search));
         addReplacement(new Replacements("%category_selected%", () -> category == null ? LANG.getString("placeholders.no-category") : category.formatted()));
-        setGui(gui);
+
+        setGui(gui, () -> parseText(GUI.getString("title", "")));
         user.addGui(this);
     }
 
@@ -145,11 +143,6 @@ public class MyWarpsGui extends GuiFrame {
         loadWarps().thenRun(() -> {
             gui.update();
         });
-    }
-
-    @Override
-    public void updateTitle() {
-        gui.updateTitle(StringUtils.format(GUI.getString("title", ""), new HashMap<>(Map.of("%page%", "" + gui.getCurrentPageNum(), "%pages%", "" + Math.max(1, gui.getPagesNum())))));
     }
 
     public CompletableFuture<Void> loadWarps() {
