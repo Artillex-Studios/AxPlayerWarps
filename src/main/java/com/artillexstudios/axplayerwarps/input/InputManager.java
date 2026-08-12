@@ -66,6 +66,7 @@ public class InputManager {
                     }, () -> {});
                 },
                 closeEvent -> {
+                    closeEvent.getInventory().clear();
                     if (ended.get()) return;
                     closeEvent.getPlayer().closeInventory();
                     Scheduler.get().run(player, task -> {
