@@ -13,7 +13,6 @@ import revxrsal.commands.orphan.Orphans;
 
 import java.util.Locale;
 import java.util.Map;
-import java.util.Optional;
 
 import static com.artillexstudios.axplayerwarps.AxPlayerWarps.CONFIG;
 import static com.artillexstudios.axplayerwarps.AxPlayerWarps.MESSAGEUTILS;
@@ -35,23 +34,20 @@ public class CommandManager {
             }
             if (parameter.hasAnnotation(OwnWarps.class)) {
                 return (args, sender, command) -> {
-                    return WarpManager.getWarps().stream().filter(warp -> warp.getOwner().equals(sender.getUniqueId())).map(Warp::getName).toList();
+                    return WarpManager.getWarps(sender.getUniqueId()).stream().map(Warp::getName).toList();
                 };
             }
             return null;
         });
 
         handler.registerValueResolver(Warp.class, resolver -> {
-            final String str = resolver.popForParameter();
-            Optional<Warp> opt = WarpManager.getWarps().stream().filter(warp -> warp.getName().equals(str)).findAny();
-            if (opt.isEmpty()) {
-                opt = WarpManager.getWarps().stream().filter(warp -> warp.getName().equalsIgnoreCase(str)).findAny();
-            }
-            if (opt.isEmpty()) {
-                MESSAGEUTILS.sendLang(resolver.actor().as(BukkitCommandActor.class).getSender(), "errors.not-found", Map.of("%warp%", str));
+            String name = resolver.popForParameter();
+            Warp warp = WarpManager.getWarp(name);
+            if (warp == null) {
+                MESSAGEUTILS.sendLang(resolver.actor().as(BukkitCommandActor.class).getSender(), "errors.not-found", Map.of("%warp%", name));
                 throw new CommandErrorException();
             }
-            return opt.get();
+            return warp;
         });
 
         reload();

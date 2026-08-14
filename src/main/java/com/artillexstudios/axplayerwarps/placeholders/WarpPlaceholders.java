@@ -65,7 +65,7 @@ public class WarpPlaceholders {
         ThrowingFunction<PlaceholderContext, String, PlaceholderException> playerWarpsHandler =handler -> {
             Player player = handler.resolve(Player.class);
             if (player == null) return empty;
-            return String.valueOf(WarpManager.getWarps().stream().filter(warp -> warp.getOwner().equals(player.getUniqueId())).count());
+            return String.valueOf(WarpManager.getWarps(player).size());
         };
         PlaceholderHandler.register("player_warps", playerWarpsHandler, true);
         PlaceholderHandler.register("my_warps", playerWarpsHandler, true);

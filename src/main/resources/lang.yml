@@ -119,7 +119,9 @@ errors:
   disallowed-name-blacklisted: "&#FF4444The given warp name is disallowed!"
   blacklist-self: "&#FF4444You can't blacklist yourself!"
   whitelist-self: "&#FF4444You can't whitelist yourself!"
-  player-not-found: "&#FF4444This player has never played on the server!"
+  transfer-self: "&#FF4444The warp is already yours!"
+  player-not-found: "&#FF4444The player has never played on the server!"
+  player-not-online: "&#FF4444The player is not online!"
   not-a-number: "&#FF4444The given value is not a valid number!"
   must-be-positive: "&#FF4444The given value is not a positive number!"
   invalid-name: "&#FF4444The given name is not valid."
@@ -140,6 +142,7 @@ errors:
   limit-reached: "&#FF4444You have reached the warp limit, you can not create any more warps! &#FF4444(&#FF0000%current%&#FF4444/&#EE0000%limit%&#FF4444)"
   nothing-withdrawable: "&#FF4444There is no money to be withdrawn!"
   not-your-warp: "&#FF4444This is not your warp!"
+  transfer-failed: "&#FF4444The &#FF0000%warp% &#FF4444warp couldn't be transferred as &#FF0000%player% &#FF4444has reached their warp limit or they are not accepting transfers!"
 
 time:
   second: "s"
@@ -166,4 +169,4 @@ commands:
 update-notifier: "&#88CCFFThere is a new version of AxPlayerWarps available! &#DDDDDD(&#FFFFFFcurrent: &#FF0000%current% &#DDDDDD| &#FFFFFFlatest: &#00FF00%latest%&#DDDDDD)"
 
 # do not change this
-version: 6
+version: 7

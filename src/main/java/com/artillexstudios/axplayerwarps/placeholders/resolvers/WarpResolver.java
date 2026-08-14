@@ -11,6 +11,6 @@ public class WarpResolver implements PlaceholderArgumentResolver<Warp> {
     @Nullable
     @Override
     public Warp resolve(String string) {
-        return WarpManager.getWarps().stream().filter(w -> w.getName().equalsIgnoreCase(string)).findAny().orElse(null);
+        return WarpManager.getWarp(string);
     }
 }

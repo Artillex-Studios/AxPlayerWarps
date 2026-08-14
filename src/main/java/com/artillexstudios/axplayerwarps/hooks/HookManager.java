@@ -26,7 +26,6 @@ public class HookManager {
     public record CurrencyOptions(String displayName) {}
 
     public static void setupHooks() {
-
         IntegrationSetup.builder()
                 .enableCurrencyIntegrations(name -> {
                     Section currencies = CURRENCIES.getSection("currencies");
@@ -106,13 +105,30 @@ public class HookManager {
     }
 
     public static void updateHooks() {
+        currencyOptions.clear();
         IntegrationManager.reload(() -> {
             for (CurrencyIntegration integration : placeholderCurrencyIntegrations) {
                 AxIntegrationsAPI.unregisterIntegration(integration);
-                currencyOptions.remove(integration.getFormattedName());
             }
             registerPlaceholderCurrencies();
         });
+        for (CurrencyIntegration integration : CurrencyIntegration.list()) {
+            if (integration instanceof PlaceholderCurrencyIntegration) continue;
+            String name = integration.getFormattedName();
+            if (!name.equals(integration.getName())) {
+                String[] plugin = name.split("-");
+                Section currencies = CURRENCIES.getSection("currencies");
+                List<Map<?, ?>> list = currencies.getMapList("%s.enabled".formatted(plugin[0]));
+                for (Map<?, ?> map : list) {
+                    String currencyName = (String) map.get("currency-name");
+                    if (!currencyName.equals(plugin[1])) continue;
+                    String displayName = (String) map.get("name");
+                    currencyOptions.put(name, new CurrencyOptions(displayName));
+                }
+                continue;
+            }
+            currencyOptions.put(name, new CurrencyOptions(CURRENCIES.getString("currencies.%s.name".formatted(name))));
+        }
     }
 
     private static void registerPlaceholderCurrencies() {

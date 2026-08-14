@@ -19,7 +19,6 @@ import org.bukkit.Location;
 import org.bukkit.entity.Player;
 
 import java.util.Map;
-import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 
 import static com.artillexstudios.axplayerwarps.AxPlayerWarps.CONFIG;
@@ -32,7 +31,7 @@ public enum Create {
     public void execute(Player sender, String warpName) {
         WarpUser user = Users.get(sender);
         long limit = user.getWarpLimit();
-        long warps = WarpManager.getWarps().stream().filter(warp -> warp.getOwner().equals(sender.getUniqueId())).count();
+        long warps = WarpManager.getWarps(sender).size();
         if (limit <= warps) {
             MESSAGEUTILS.sendLang(sender, "errors.limit-reached",
                     Map.of("%current%", "" + warps, "%limit%", "" + limit));
@@ -65,12 +64,8 @@ public enum Create {
             }
         }
 
-        Optional<Warp> warpOpt = WarpManager.getWarps().stream().filter(warp -> {
-            boolean caseSensitive = CONFIG.getBoolean("warp-naming.case-sensitive", false);
-            if (caseSensitive) return warp.getName().equals(warpName);
-            else return warp.getName().equalsIgnoreCase(warpName);
-        }).findAny();
-        if (warpOpt.isPresent()) {
+        Warp foundWarp = WarpManager.getWarp(warpName, CONFIG.getBoolean("warp-naming.case-sensitive", false));
+        if (foundWarp != null) {
             MESSAGEUTILS.sendLang(sender, "errors.name-exists");
             return;
         }

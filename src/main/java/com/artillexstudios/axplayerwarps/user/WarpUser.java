@@ -70,7 +70,6 @@ public class WarpUser {
 
     public void addGui(GuiFrame<?> guiFrame) {
         lastGuis.add(guiFrame);
-//        System.out.println("add: " + lastGuis.size() + " " + guiFrame);
     }
 
     public List<Warp> getFavorites() {

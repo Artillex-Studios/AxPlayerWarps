@@ -27,9 +27,9 @@ import com.artillexstudios.axplayerwarps.user.Users;
 import com.artillexstudios.axplayerwarps.user.WarpUser;
 import com.artillexstudios.axplayerwarps.utils.WarpNameUtils;
 import com.artillexstudios.axplayerwarps.warps.Warp;
+import com.artillexstudios.axplayerwarps.warps.WarpManager;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
-import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
@@ -38,7 +38,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
-import java.util.UUID;
 
 import static com.artillexstudios.axplayerwarps.AxPlayerWarps.CONFIG;
 import static com.artillexstudios.axplayerwarps.AxPlayerWarps.MESSAGEUTILS;
@@ -150,27 +149,46 @@ public class EditWarpGui extends GuiFrame<Gui> {
 
         createItem("transfer", event -> {
             GuiActions.run(player, this, event, section.getStringList("transfer.actions"));
-            warp.setLocation(player.getLocation());
             InputManager.getInput(player, "transfer", result -> {
+                player.closeInventory();
+                if (result.equalsIgnoreCase(player.getName())) {
+                    MESSAGEUTILS.sendLang(player, "errors.transfer-self");
+                    return;
+                }
+
+                Player transferTo = Bukkit.getPlayer(result);
+                if (transferTo == null) {
+                    MESSAGEUTILS.sendLang(player, "errors.player-not-online", Map.of(
+                            "%player%", result,
+                            "%warp%", warp.getName()
+                    ));
+                    return;
+                }
+                WarpUser transferUser = Users.get(transferTo);
+                long limit = transferUser.getWarpLimit();
+                long warps = WarpManager.getWarps(transferTo).size();
+                if (limit <= warps) {
+                    MESSAGEUTILS.sendLang(player, "errors.transfer-failed", Map.of(
+                            "%player%", transferTo.getName(),
+                            "%warp%", warp.getName()
+                    ));
+                    return;
+                }
+
+                warp.setOwner(transferTo.getUniqueId());
+                MESSAGEUTILS.sendLang(transferTo, "editor.new-owner", Map.of(
+                        "%player%", player.getName(),
+                        "%warp%", warp.getName()
+                ));
+                MESSAGEUTILS.sendLang(player, "editor.transferred", Map.of(
+                        "%player%", transferTo.getName(),
+                        "%warp%", warp.getName()
+                ));
+
                 AxPlayerWarps.getThreadedQueue().submit(() -> {
-                    UUID uuid = AxPlayerWarps.getDatabase().getUUIDFromName(result);
-                    if (uuid == null) {
-                        MESSAGEUTILS.sendLang(player, "errors.player-not-found");
-                    } else {
-                        Player transferTo = Bukkit.getPlayer(uuid);
-                        warp.setOwner(uuid);
-                        AxPlayerWarps.getDatabase().updateWarp(warp);
-                        OfflinePlayer pl = Bukkit.getOfflinePlayer(uuid);
-                        AxPlayerWarps.getDatabase().removeFromList(warp, AccessList.WHITELIST, pl);
-                        AxPlayerWarps.getDatabase().removeFromList(warp, AccessList.BLACKLIST, pl);
-
-                        if (transferTo != null)
-                            MESSAGEUTILS.sendLang(transferTo, "editor.new-owner",
-                                    Map.of("%player%", player.getName(), "%warp%", warp.getName()));
-
-                        MESSAGEUTILS.sendLang(player, "editor.transferred", Map.of("%player%", pl.getName() == null ? "---" : pl.getName()));
-                    }
-                    Scheduler.get().runAt(player.getLocation(), () -> player.closeInventory());
+                    AxPlayerWarps.getDatabase().updateWarp(warp);
+                    AxPlayerWarps.getDatabase().removeFromList(warp, AccessList.WHITELIST, transferTo);
+                    AxPlayerWarps.getDatabase().removeFromList(warp, AccessList.BLACKLIST, transferTo);
                 });
             });
         });

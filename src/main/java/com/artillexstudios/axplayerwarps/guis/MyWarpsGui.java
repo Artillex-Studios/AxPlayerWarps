@@ -149,9 +149,8 @@ public class MyWarpsGui extends PaginatedGuiFrame {
         CompletableFuture<Void> future = new CompletableFuture<>();
 
         AsyncUtils.submit(() -> {
-            var filtered = WarpManager.getWarps()
+            List<Warp> filtered = WarpManager.getWarps(player)
                     .stream()
-                    .filter(warp -> warp.getOwner().equals(player.getUniqueId()))
                     .sorted(new WarpComparator(user.getSorting(), player))
                     .toList();
 
@@ -159,10 +158,8 @@ public class MyWarpsGui extends PaginatedGuiFrame {
             List<CompletableFuture<?>> futures = new ArrayList<>();
             int i = 0;
             for (Warp warp : filtered) {
-
                 // category
                 if (category != null && !Objects.equals(warp.getCategory(), category)) continue;
-
                 // search
                 if (search != null && (!warp.getName().toLowerCase().contains(search) && !warp.getOwnerName().toLowerCase().contains(search))) continue;
 

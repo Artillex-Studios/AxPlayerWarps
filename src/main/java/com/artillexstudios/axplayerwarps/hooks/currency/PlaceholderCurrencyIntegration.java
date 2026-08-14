@@ -27,10 +27,6 @@ public class PlaceholderCurrencyIntegration extends CurrencyIntegration {
         return ClassUtils.INSTANCE.classExists("me.clip.placeholderapi.PlaceholderAPI");
     }
 
-    public String getDisplayName() {
-        return section.getString("name", "---");
-    }
-
     @Override
     public boolean worksOffline() {
         return section.getBoolean("works-offline", false);
