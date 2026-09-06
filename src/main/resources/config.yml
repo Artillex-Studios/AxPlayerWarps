@@ -81,6 +81,7 @@ warp-naming:
   # - '*name*' #  disallows text containing 'name'
   disallowed:
     - "*banned_warp_name*"
+  disallowed-ignore-case: false
 
 # worlds where creating warps is disallowed
 # you can use the regex options from the section above (warp-naming.disallowed)
