@@ -3,14 +3,19 @@ package com.artillexstudios.axplayerwarps.commands;
 import com.artillexstudios.axplayerwarps.AxPlayerWarps;
 import com.artillexstudios.axplayerwarps.commands.annotations.AllWarps;
 import com.artillexstudios.axplayerwarps.commands.annotations.OwnWarps;
+import com.artillexstudios.axplayerwarps.commands.shortcuts.CreateWarpCommand;
+import com.artillexstudios.axplayerwarps.commands.shortcuts.EditWarpCommand;
+import com.artillexstudios.axplayerwarps.commands.shortcuts.GoToWarpCommand;
 import com.artillexstudios.axplayerwarps.utils.CommandMessages;
 import com.artillexstudios.axplayerwarps.warps.Warp;
 import com.artillexstudios.axplayerwarps.warps.WarpManager;
 import revxrsal.commands.bukkit.BukkitCommandActor;
 import revxrsal.commands.bukkit.BukkitCommandHandler;
 import revxrsal.commands.exception.CommandErrorException;
+import revxrsal.commands.orphan.OrphanCommand;
 import revxrsal.commands.orphan.Orphans;
 
+import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
@@ -59,6 +64,19 @@ public class CommandManager {
         handler.register(Orphans.path(CONFIG.getStringList("main-command-aliases").toArray(String[]::new)).handler(new MainCommand()));
         handler.register(Orphans.path(CONFIG.getStringList("admin-command-aliases").toArray(String[]::new)).handler(new AdminCommand()));
 
+        registerIfConfigured("subcommand-aliases.warp", new GoToWarpCommand());
+        registerIfConfigured("subcommand-aliases.create", new CreateWarpCommand());
+        registerIfConfigured("subcommand-aliases.edit", new EditWarpCommand());
+
         handler.registerBrigadier();
+    }
+
+    // registers an optional standalone top-level command from a config alias list.
+    // does nothing if the list is empty, so the shortcut stays disabled unless configured.
+    private static void registerIfConfigured(String configPath, OrphanCommand command) {
+        List<String> aliases = CONFIG.getStringList(configPath);
+        if (aliases.isEmpty()) return;
+
+        handler.register(Orphans.path(aliases.toArray(String[]::new)).handler(command));
     }
 }

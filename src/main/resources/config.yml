@@ -40,6 +40,18 @@ admin-command-aliases:
   - "pwarpadmin"
   - "pwarpsadmin"
 
+# Optional: expose specific subcommands as their own standalone top-level
+# commands, e.g. "/gotowarp <warp>" instead of "/pw warp <warp>".
+# Leave a list empty to disable that shortcut.
+# requires a restart to update
+subcommand-aliases:
+  # equivalent to the "warp"/"go" subcommand
+  warp: []
+  # equivalent to the "create"/"set" subcommand
+  create: []
+  # equivalent to the "edit"/"settings" subcommand
+  edit: []
+
 # how often should players be able to refresh guis?
 # this doesn't impact performance too much, however you should not set it too low
 gui-refresh-cooldown-milliseconds: 100
