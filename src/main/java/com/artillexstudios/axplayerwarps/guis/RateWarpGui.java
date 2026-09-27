@@ -1,6 +1,7 @@
 package com.artillexstudios.axplayerwarps.guis;
 
 import com.artillexstudios.axapi.config.Config;
+import com.artillexstudios.axapi.libs.boostedyaml.block.implementation.Section;
 import com.artillexstudios.axapi.libs.boostedyaml.settings.dumper.DumperSettings;
 import com.artillexstudios.axapi.libs.boostedyaml.settings.general.GeneralSettings;
 import com.artillexstudios.axapi.libs.boostedyaml.settings.loader.LoaderSettings;
@@ -59,23 +60,26 @@ public class RateWarpGui extends GuiFrame<Gui> {
     }
 
     public void open() {
-        final List<String> slots = section.getStringList("favorite.slot");
-        var slotOverrides = getSlots(slots.isEmpty() ? List.of(section.getString("favorite.slot")) : slots);
+        Section favorite = section.getSection("favorite");
+        if (favorite != null) {
+            List<String> slots = section.getStringList("favorite.slot");
+            List<Integer> slotOverrides = getSlots(slots.isEmpty() ? List.of(section.getString("favorite.slot", "")) : slots);
 
-        boolean isFavorite = user.getFavorites().contains(warp);
-        createItem("favorite." + (isFavorite ? "favorite" : "not-favorite"), event -> {
-            GuiActions.run(player, this, event, section.getStringList("favorite.actions"));
-            AxPlayerWarps.getThreadedQueue().submit(() -> {
-                if (isFavorite) {
-                    AxPlayerWarps.getDatabase().removeFromFavorites(player, warp);
-                    MESSAGEUTILS.sendLang(player, "favorite.remove", Map.of("%warp%", warp.getName()));
-                } else {
-                    AxPlayerWarps.getDatabase().addToFavorites(player, warp);
-                    MESSAGEUTILS.sendLang(player, "favorite.add", Map.of("%warp%", warp.getName()));
-                }
-                Scheduler.get().run(() -> open());
-            });
-        }, slotOverrides);
+            boolean isFavorite = user.getFavorites().contains(warp);
+            createItem("favorite." + (isFavorite ? "favorite" : "not-favorite"), event -> {
+                GuiActions.run(player, this, event, section.getStringList("favorite.actions"));
+                AxPlayerWarps.getThreadedQueue().submit(() -> {
+                    if (isFavorite) {
+                        AxPlayerWarps.getDatabase().removeFromFavorites(player, warp);
+                        MESSAGEUTILS.sendLang(player, "favorite.remove", Map.of("%warp%", warp.getName()));
+                    } else {
+                        AxPlayerWarps.getDatabase().addToFavorites(player, warp);
+                        MESSAGEUTILS.sendLang(player, "favorite.add", Map.of("%warp%", warp.getName()));
+                    }
+                    Scheduler.get().run(() -> open());
+                });
+            }, slotOverrides);
+        }
 
         createItem("teleport", event -> {
             GuiActions.run(player, this, event, section.getStringList("teleport.actions"));

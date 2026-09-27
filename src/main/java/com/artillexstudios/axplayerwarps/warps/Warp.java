@@ -320,7 +320,9 @@ public class Warp {
                 completeTeleportPlayer(player);
                 return;
             }
-            Scheduler.get().runAt(player.getLocation(), player::closeInventory);
+            Scheduler.get().run(player, task -> {
+                player.closeInventory();
+            }, () -> {});
             WarpQueue.addToQueue(player, this);
         });
     }
@@ -404,7 +406,9 @@ public class Warp {
             if (preTeleportEvent.isCancelled()) return;
             double newTeleportPrice = preTeleportEvent.getTeleportPrice();
 
-            player.closeInventory();
+            Scheduler.get().execute(player, () -> {
+                player.closeInventory();
+            }, () -> {}, 0);
             CompletableFuture<Boolean> future = CompletableFuture.completedFuture(true);
             if (needsToPay && newTeleportPrice > 0) {
                 future = getCurrencyIntegration().takeBalance(player.getUniqueId(), newTeleportPrice);

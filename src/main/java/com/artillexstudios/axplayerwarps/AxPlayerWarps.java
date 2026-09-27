@@ -157,7 +157,6 @@ public final class AxPlayerWarps extends AxPlugin {
 
     public void updateFlags() {
         Config config = new Config(new File(getDataFolder(), "config.yml"));
-        FeatureFlags.USE_LEGACY_HEX_FORMATTER.set(false);
         FeatureFlags.PLACEHOLDER_API_HOOK.set(true);
         FeatureFlags.PLACEHOLDER_API_IDENTIFIER.set("axplayerwarps");
         FeatureFlags.ASYNC_UTILS_POOL_SIZE.set(config.getInt("gui-loading-threads", 2));
