@@ -40,6 +40,11 @@ admin-command-aliases:
   - "pwarpadmin"
   - "pwarpsadmin"
 
+# should the Brigadier command parser be used? it is more strict, provides better colors/errors for command parameters
+# you should keep this disabled if you want the /pw <warp> to work or if you have warp names with unicode characters that Brigadier considers invalid (you can still wrap them in quotes "" to use them if necessary)
+# requires a restart to update
+enable-brigadier-support: false
+
 # how often should players be able to refresh guis?
 # this doesn't impact performance too much, however you should not set it too low
 gui-refresh-cooldown-milliseconds: 100
@@ -223,4 +228,4 @@ update-notifier:
 debug: false
 
 # do not change this
-version: 8
+version: 9

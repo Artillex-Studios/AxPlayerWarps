@@ -59,6 +59,8 @@ public class CommandManager {
         handler.register(Orphans.path(CONFIG.getStringList("main-command-aliases").toArray(String[]::new)).handler(new MainCommand()));
         handler.register(Orphans.path(CONFIG.getStringList("admin-command-aliases").toArray(String[]::new)).handler(new AdminCommand()));
 
-        handler.registerBrigadier();
+        if (CONFIG.getBoolean("enable-brigadier-support", false)) {
+            handler.registerBrigadier();
+        }
     }
 }
